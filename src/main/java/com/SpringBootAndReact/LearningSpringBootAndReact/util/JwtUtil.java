@@ -27,7 +27,7 @@ public class JwtUtil {
 	
 	private static final long serialVersionUID = -2550185165626007488L;
 	
-	//Determines how long the JWT is valid for (days*hours*minutes*seconds)
+	//Determines how long the JWT is valid for
 	public static final long JWT_TOKEN_VALIDITY = 30*24*60*60;
 	
 	//Converting the secret string to a Java Key object type

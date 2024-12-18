@@ -8,10 +8,14 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 //Defining this class as an Entity, for a Database
@@ -27,7 +31,12 @@ public class User implements UserDetails{
 	private Long id;
 	private LocalDate cohortStartDate; //Used to specify that this is just a date
 	private String username;
+	@JsonIgnore
 	private String password;
+	//Defining mapping between users and authorities
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+	@JsonIgnore
+	private List<Authority> authorities = new ArrayList<>();
 	
 	//Getters and Setters for this class
 	public Long getId() {
@@ -63,11 +72,21 @@ public class User implements UserDetails{
 	//Authorities are spring specifics
 	//They are essentially roles, deciding the access rights that a user may have
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		//Creating a modifyable list of roles
-		List<GrantedAuthority> roles = new ArrayList<>();
-		//Adding a role to the list
-		roles.add(new Authority("ROLE_STUDENT"));
-		return roles;
+		return authorities;
+	}
+	
+	public void setAuthorities(List<Authority> authorities) {
+		this.authorities = authorities;
+	}
+	
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+	
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
 	}
 	
 	

@@ -46,7 +46,7 @@ public class JwtFilter extends OncePerRequestFilter{
 		//If it is not, move on
 		final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 		//All our JWTs will start with Bearer 
-		if (!StringUtils.hasText(header) || (StringUtils.hasText(header) && header.startsWith("Bearer "))) {
+		if (!StringUtils.hasText(header) || (StringUtils.hasText(header) && !header.startsWith("Bearer "))) {
 			chain.doFilter(request,response);
 			return;
 		}
