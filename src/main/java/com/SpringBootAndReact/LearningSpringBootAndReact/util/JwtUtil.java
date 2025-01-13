@@ -28,7 +28,7 @@ public class JwtUtil {
 	private static final long serialVersionUID = -2550185165626007488L;
 	
 	//Determines how long the JWT is valid for
-	public static final long JWT_TOKEN_VALIDITY = 30*24*60*60;
+	public static final long JWT_TOKEN_VALIDITY = 7*24*60*60;
 	
 	//Converting the secret string to a Java Key object type
 	private SecretKey getSigningKey(String secret) {
@@ -91,7 +91,7 @@ public class JwtUtil {
 		return Jwts.builder()
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .claims(claims) // Use the non-deprecated method to set claims
                 .signWith(secretKey) // Use the SecretKey object
                 .compact();

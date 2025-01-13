@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import { useLocalState } from "../util/useLocalStorage";
+import {
+  Button,
+  Col,
+  Container,
+  FormControl,
+  FormGroup,
+  FormLabel,
+  Row,
+} from "react-bootstrap";
 
 const Login = () => {
   //Storing the username and password
@@ -28,7 +37,7 @@ const Login = () => {
         "Content-Type": "application/json",
       },
       //This is defining that you are making a POST request
-      //NOTE : In the LoginController, login only has a PostMapping defined
+      //NOTE : In the AuthController, login only has a PostMapping defined
       method: "post",
       //Defining the body of the HTTP Request, what the fetch is giving the server
       body: JSON.stringify(reqBody),
@@ -60,27 +69,70 @@ const Login = () => {
 
   return (
     <>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          type="email"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <button id="submit" type="button" onClick={() => sendLoginRequest()}>
-        Submit
-      </button>
+      <Container className="mt-5">
+        <Row className="justify-content-center align-items-center">
+          <Col md="6">
+            <FormGroup className="mb-3">
+              <FormLabel className="fs-4" htmlFor="username">
+                Username
+              </FormLabel>
+              <FormControl
+                type="email"
+                id="username"
+                size="lg"
+                placeholder="example@email.com"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row className="justify-content-center align-items-center">
+          <Col md="8" lg="6">
+            <FormGroup className="mb-3">
+              <FormLabel className="fs-4" htmlFor="password">
+                Password
+              </FormLabel>
+              <FormControl
+                type="password"
+                id="password"
+                size="lg"
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row className="justify-content-center align-items-center">
+          <Col
+            md="8"
+            lg="6"
+            className="mt-2 d-flex flex-column gap-5 flex-md-row justify-content-between"
+          >
+            <Button
+              variant="success"
+              size="lg"
+              id="submit"
+              type="button"
+              onClick={() => sendLoginRequest()}
+            >
+              Submit
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              id="exit"
+              type="button"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Exit
+            </Button>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };
