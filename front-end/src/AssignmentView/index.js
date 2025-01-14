@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useLocalState } from "../util/useLocalStorage";
 import ajax from "../Services/fetchSerivce";
+import {
+  Badge,
+  Button,
+  Col,
+  Container,
+  Dropdown,
+  DropdownButton,
+  Form,
+  Row,
+} from "react-bootstrap";
 
 const AssignmentView = () => {
   //Getting the id of the assigment from the URL
@@ -12,6 +22,9 @@ const AssignmentView = () => {
 
   //Storing the assignment we collected
   const [assignment, setAssignment] = useState(null);
+
+  //Storing the selected assignmentNum as title
+  const [title, setTitle] = useState("");
 
   //Function to update our assignment object with the values input in the form
   //This keeps all our changes in an object, rather than individual variables
@@ -50,32 +63,68 @@ const AssignmentView = () => {
   return (
     <>
       {assignment ? (
-        <div>
-          <h1>Assignment {assignmentId}</h1>
-          <h2>Status: {assignment.status}</h2>
-          {/* Creating the form to allow the user to update the assigmnets */}
-          <h3>
-            GitHub URL:{" "}
-            <input
-              type="url"
-              id="gitHubUrl"
-              value={assignment.githubURL ? assignment.githubURL : ""}
-              onChange={(e) => updateAssignment("githubURL", e.target.value)}
-            />
-          </h3>
-          <h3>
-            Branch :{" "}
-            <input
-              type="text"
-              id="branch"
-              value={assignment.branch ? assignment.branch : ""}
-              onChange={(e) => updateAssignment("branch", e.target.value)}
-            />
-          </h3>
-          <button type="button" onClick={() => save()}>
+        <Container className="mt-5">
+          {/* Aligning the items center in the row */}
+          <Row className="d-flex align-items-center">
+            <Col>
+              <h1>Assignment {assignmentId} </h1>
+            </Col>
+            <Col>
+              <Badge pill bg="info" className="fs-5">
+                {assignment.status}
+              </Badge>
+            </Col>
+          </Row>
+          {/* Creating the form to allow the user to update the assignments */}
+          <Form.Group as={Row} className="my-3" controlId="assignmentName">
+            <Form.Label column sm="3" md="2">
+              AssignmentNumber
+            </Form.Label>
+            <Col sm="9" md="8" lg="6">
+              <DropdownButton id="assignmentName" title={title}>
+                {["1", "2", "3", "4", "5", "6"].map((assignmentNum) => (
+                  <Dropdown.Item
+                    eventKey={assignmentNum}
+                    onClick={(e) => setTitle(e.target.value)}
+                  >
+                    {assignmentNum}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="my-3" controlId="gitHubUrl">
+            <Form.Label column sm="3" md="2">
+              Github URL :
+            </Form.Label>
+            <Col sm="9" md="8" lg="6">
+              <Form.Control
+                id="gitHubUrl"
+                type="url"
+                placeholder="https://github.com/username/repoName"
+                value={assignment.githubURL ? assignment.githubURL : ""}
+                onChange={(e) => updateAssignment("githubURL", e.target.value)}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-3" controlId="branch">
+            <Form.Label column sm="3" md="2">
+              Branch :
+            </Form.Label>
+            <Col sm="9" md="8" lg="6">
+              <Form.Control
+                id="Branch"
+                type="text"
+                placeholder="example_branch_name"
+                value={assignment.branch ? assignment.branch : ""}
+                onChange={(e) => updateAssignment("branch", e.target.value)}
+              />
+            </Col>
+          </Form.Group>
+          <Button size="lg" type="button" onClick={() => save()}>
             Submit Assignment
-          </button>
-        </div>
+          </Button>
+        </Container>
       ) : (
         <div>Assignment with this Id doesn't exist</div>
       )}

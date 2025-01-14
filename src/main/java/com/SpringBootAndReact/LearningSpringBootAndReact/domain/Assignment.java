@@ -13,6 +13,7 @@ public class Assignment {
 	//GeneratedValue uses the strategy to automatically generate this id
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private Integer number;
 	private String status;
 	private String branch;
 	private String githubURL;
@@ -57,5 +58,11 @@ public class Assignment {
 	}
 	public void setBranch(String branch) {
 		this.branch = branch;
+	}
+	public Integer getNumber() {
+		return number;
+	}
+	public void setName(Integer number) {
+		this.number = number;
 	}
 }
