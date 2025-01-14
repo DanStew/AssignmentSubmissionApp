@@ -23,8 +23,8 @@ const AssignmentView = () => {
   //Storing the assignment we collected
   const [assignment, setAssignment] = useState(null);
 
-  //Storing the selected assignmentNum as title
-  const [title, setTitle] = useState("");
+  //Storing the different assignments, from enum
+  const [assignmentEnums, setAssignmentEnums] = useState([]);
 
   //Function to update our assignment object with the values input in the form
   //This keeps all our changes in an object, rather than individual variables
@@ -54,9 +54,11 @@ const AssignmentView = () => {
     //Making a GET request asking the system for the assignment
     ajax(`/api/assignments/${assignmentId}`, "GET", jwt, null)
       //Gathering the data from the response
-      .then((assignmentData) => {
+      .then((assignmentResponse) => {
         //Storing the assignment
-        setAssignment(assignmentData);
+        setAssignment(assignmentResponse.assignment);
+        //Storing the assignment enums
+        setAssignmentEnums(assignmentResponse.assignmentEnums);
       });
   }, []);
 
@@ -76,18 +78,15 @@ const AssignmentView = () => {
             </Col>
           </Row>
           {/* Creating the form to allow the user to update the assignments */}
-          <Form.Group as={Row} className="my-3" controlId="assignmentName">
+          <Form.Group as={Row} className="my-3">
             <Form.Label column sm="3" md="2">
               AssignmentNumber
             </Form.Label>
             <Col sm="9" md="8" lg="6">
-              <DropdownButton id="assignmentName" title={title}>
-                {["1", "2", "3", "4", "5", "6"].map((assignmentNum) => (
-                  <Dropdown.Item
-                    eventKey={assignmentNum}
-                    onClick={(e) => setTitle(e.target.value)}
-                  >
-                    {assignmentNum}
+              <DropdownButton id="assignmentName">
+                {assignmentEnums.map((assignmentEnum) => (
+                  <Dropdown.Item key={assignmentEnum.assignmentNum}>
+                    {assignmentEnum.assignmentNum}
                   </Dropdown.Item>
                 ))}
               </DropdownButton>

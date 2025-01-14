@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.SpringBootAndReact.LearningSpringBootAndReact.domain.Assignment;
 import com.SpringBootAndReact.LearningSpringBootAndReact.domain.User;
+import com.SpringBootAndReact.LearningSpringBootAndReact.dto.AssignmentResponseDto;
 import com.SpringBootAndReact.LearningSpringBootAndReact.service.AssignmentService;
 
 @RestController
@@ -47,9 +48,11 @@ public class AssignmentController {
 		//Get the assignment with the given id
 		//If the assignment with the given id doesn't exist, return null
 		Optional<Assignment> assignmentOpt = assignmentService.findById(assignmentId);
+		//Making the AssignmentResponseDto
+		AssignmentResponseDto assignmentResponse = new AssignmentResponseDto(assignmentOpt.orElse(new Assignment()));
 		//Returning the assignment that we received
 		//If we don't have an assignment, a blank assignment will be returned (to deal with null values)
-		return ResponseEntity.ok(assignmentOpt.orElse(new Assignment()));
+		return ResponseEntity.ok(assignmentResponse);
 	}
 	
 	//Mapping to ask the server to Update the given assignment
