@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocalState } from "../util/useLocalStorage";
 import ajax from "../Services/fetchSerivce";
 import {
   Badge,
   Button,
+  ButtonGroup,
   Col,
   Container,
   Dropdown,
@@ -21,10 +22,30 @@ const AssignmentView = () => {
   const [jwt, setJwt] = useLocalState("", "jwt");
 
   //Storing the assignment we collected
-  const [assignment, setAssignment] = useState(null);
+  const [assignment, setAssignment] = useState({
+    branch: "",
+    githubURL: "",
+    number: null,
+    status: null,
+  });
 
   //Storing the different assignments, from enum
   const [assignmentEnums, setAssignmentEnums] = useState([]);
+  //Storing the different Assignment Statuses
+  const [assignmentStatuses, setAssignmentStatuses] = useState([]);
+
+  //Using useRef to store the previous assignment value
+  const prevAssignmentValue = useRef(assignment);
+
+  //Updating the value of prevAssignmentValue, using a UseEffect
+  useEffect(() => {
+    //If the two statuses are not equal to eachother, we need to save the assignment
+    if (prevAssignmentValue.current.status !== assignment.status) {
+      save();
+    }
+    //Updating the value of the prevAssignment
+    prevAssignmentValue.current = assignment;
+  }, [assignment]);
 
   //Function to update our assignment object with the values input in the form
   //This keeps all our changes in an object, rather than individual variables
@@ -40,13 +61,20 @@ const AssignmentView = () => {
 
   //Function to save our new assignment to the database (updating it)
   function save() {
-    //Making the fetch request
-    ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment)
-      //Gathering the data from the response
-      .then((assignmentData) => {
-        //Saving the assignment again (although should be the same)
-        setAssignment(assignmentData);
-      });
+    //Seeing if we need to change the status value
+    if (assignment.status === assignmentStatuses[0].status) {
+      updateAssignment("status", assignmentStatuses[1].status);
+    }
+    //If we don't need to change the status, run the save
+    else {
+      //Making the fetch request
+      ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment)
+        //Gathering the data from the response
+        .then((assignmentData) => {
+          //Saving the assignment again (although should be the same)
+          setAssignment(assignmentData);
+        });
+    }
   }
 
   //Getting the assignment
@@ -59,6 +87,8 @@ const AssignmentView = () => {
         setAssignment(assignmentResponse.assignment);
         //Storing the assignment enums
         setAssignmentEnums(assignmentResponse.assignmentEnums);
+        //Storing the statuses
+        setAssignmentStatuses(assignmentResponse.statusEnums);
       });
   }, []);
 
@@ -69,7 +99,11 @@ const AssignmentView = () => {
           {/* Aligning the items center in the row */}
           <Row className="d-flex align-items-center">
             <Col>
-              <h1>Assignment {assignmentId} </h1>
+              {assignment.number ? (
+                <h1>Assignment {assignment.number} </h1>
+              ) : (
+                <h1>No Assignment Selected</h1>
+              )}
             </Col>
             <Col>
               <Badge pill bg="info" className="fs-5">
@@ -83,7 +117,18 @@ const AssignmentView = () => {
               AssignmentNumber
             </Form.Label>
             <Col sm="9" md="8" lg="6">
-              <DropdownButton id="assignmentName">
+              <DropdownButton
+                as={ButtonGroup}
+                id="assignmentName"
+                onSelect={(e, evtKey) => {
+                  updateAssignment("number", evtKey.target.text);
+                }}
+                title={
+                  assignment.number
+                    ? `Assignment : ${assignment.number}`
+                    : "Select an Assignment"
+                }
+              >
                 {assignmentEnums.map((assignmentEnum) => (
                   <Dropdown.Item key={assignmentEnum.assignmentNum}>
                     {assignmentEnum.assignmentNum}
@@ -98,7 +143,6 @@ const AssignmentView = () => {
             </Form.Label>
             <Col sm="9" md="8" lg="6">
               <Form.Control
-                id="gitHubUrl"
                 type="url"
                 placeholder="https://github.com/username/repoName"
                 value={assignment.githubURL ? assignment.githubURL : ""}
@@ -112,7 +156,6 @@ const AssignmentView = () => {
             </Form.Label>
             <Col sm="9" md="8" lg="6">
               <Form.Control
-                id="Branch"
                 type="text"
                 placeholder="example_branch_name"
                 value={assignment.branch ? assignment.branch : ""}

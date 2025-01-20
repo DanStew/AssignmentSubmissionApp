@@ -6,12 +6,15 @@ import java.util.List;
 
 import com.SpringBootAndReact.LearningSpringBootAndReact.domain.Assignment;
 import com.SpringBootAndReact.LearningSpringBootAndReact.enums.AssignmentEnum;
+import com.SpringBootAndReact.LearningSpringBootAndReact.enums.AssignmentStatusEnum;
 
 public class AssignmentResponseDto {
 	//Storing the assignment
 	private Assignment assignment;
 	//Storing all of the AssignmentEnum values
 	private AssignmentEnum[] assignmentEnums = AssignmentEnum.values();
+	//Storing the status of the Assignment
+	private AssignmentStatusEnum[] statusEnums = AssignmentStatusEnum.values();
 	
 	//Constructor to set the assignment
 	public AssignmentResponseDto(Assignment assignment) {
@@ -19,6 +22,10 @@ public class AssignmentResponseDto {
 		this.assignment = assignment;
 	}
 	
+	public AssignmentStatusEnum[] getStatusEnums() {
+		return statusEnums;
+	}
+
 	//Getters and Setters
 	//We don't need to get or set assignmentEnum, hence why no functions
 	public Assignment getAssignment() {

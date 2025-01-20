@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.SpringBootAndReact.LearningSpringBootAndReact.domain.Assignment;
 import com.SpringBootAndReact.LearningSpringBootAndReact.domain.User;
+import com.SpringBootAndReact.LearningSpringBootAndReact.enums.AssignmentStatusEnum;
 import com.SpringBootAndReact.LearningSpringBootAndReact.repository.AssignmentRepository;
 
 @Service
@@ -22,7 +23,7 @@ public class AssignmentService {
 	//Saving a default empty assignment
 	public Assignment save(User user) {
 		Assignment assignment  = new Assignment();
-		assignment.setStatus("Needs to be Submitted");
+		assignment.setStatus(AssignmentStatusEnum.PENDING_SUBMISSION.getStatus());
 		assignment.setUser(user);
 		//Returning the newly made assignment object, back to the controller
 		return assignmentRepo.save(assignment);
