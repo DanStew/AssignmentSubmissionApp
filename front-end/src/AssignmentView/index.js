@@ -40,7 +40,10 @@ const AssignmentView = () => {
   //Updating the value of prevAssignmentValue, using a UseEffect
   useEffect(() => {
     //If the two statuses are not equal to eachother, we need to save the assignment
-    if (prevAssignmentValue.current.status !== assignment.status) {
+    if (
+      prevAssignmentValue.current.status !== assignment.status &&
+      prevAssignmentValue.current.status != null
+    ) {
       save();
     }
     //Updating the value of the prevAssignment
@@ -67,6 +70,7 @@ const AssignmentView = () => {
     }
     //If we don't need to change the status, run the save
     else {
+      console.log(assignment);
       //Making the fetch request
       ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment)
         //Gathering the data from the response
@@ -163,9 +167,18 @@ const AssignmentView = () => {
               />
             </Col>
           </Form.Group>
-          <Button size="lg" type="button" onClick={() => save()}>
-            Submit Assignment
-          </Button>
+          <div className="d-flex justify-content-between">
+            <Button size="lg" type="button" onClick={() => save()}>
+              Submit Assignment
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => (window.location.href = "/dashboard")}
+            >
+              Back
+            </Button>
+          </div>
         </Container>
       ) : (
         <div>Assignment with this Id doesn't exist</div>

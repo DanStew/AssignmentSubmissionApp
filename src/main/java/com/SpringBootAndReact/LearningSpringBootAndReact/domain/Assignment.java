@@ -59,6 +59,9 @@ public class Assignment {
 	public void setBranch(String branch) {
 		this.branch = branch;
 	}
+	public void setNumber(Integer number) {
+		this.number = number;
+	}
 	public Integer getNumber() {
 		return number;
 	}

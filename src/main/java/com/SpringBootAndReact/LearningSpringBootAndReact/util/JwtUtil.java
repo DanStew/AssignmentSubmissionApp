@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -82,7 +83,18 @@ public class JwtUtil {
 	
 	//Function to generate a new token (public interface for token generation)
 	public String generateToken(UserDetails userDetails) {
+		//This is a data store that stores values in Key:Value pairs (similar to dictionary)
 		Map<String, Object> claims = new HashMap<>();
+		//Getting a list of the user's authorities, and adding it to the claims
+		//These claims are then added to the JWT, when built
+		//NOTE: userDetails.getAuthorities() gets all the information about the user
+		//The other code .stream().map().collect() is used to just get the Authority attribute
+		//We turn the authority attributes collected into a list, incase a user has multiple authorities
+		//It creates a List<String> of all authorities the user has
+		claims.put("authorities", userDetails.getAuthorities()
+												.stream()
+												.map(auth -> auth.getAuthority())
+												.collect(Collectors.toList()));
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 	

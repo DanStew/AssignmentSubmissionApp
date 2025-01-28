@@ -36,9 +36,7 @@ public class AssignmentController {
 	//Mapping to get the assignments from the database
 	@GetMapping("")
 	public ResponseEntity<?> getAssignments(@AuthenticationPrincipal User user){
-		//Getting the user's assignments
 		Set<Assignment> userAssignments = assignmentService.findByUser(user);
-		//Returning the assignments
 		return ResponseEntity.ok(userAssignments);
 	}
 	

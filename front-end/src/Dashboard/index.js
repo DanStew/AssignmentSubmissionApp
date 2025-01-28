@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocalState } from "../util/useLocalStorage";
 import { Link, Navigate } from "react-router-dom";
 import ajax from "../Services/fetchSerivce";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 
 const Dashboard = () => {
   //Storing the JWT from the HTTP Response
@@ -35,6 +35,22 @@ const Dashboard = () => {
 
   return (
     <div style={{ margin: "2em" }}>
+      <Row>
+        <Col>
+          {/* Creating a logout button on the website */}
+          <div
+            className="d-flex justify-content-end"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              //Removing the JWT and moving the user to the login page
+              setJwt(null);
+              window.location.href = "/login";
+            }}
+          >
+            Logout
+          </div>
+        </Col>
+      </Row>
       <div className="mb-5">
         <Button size="lg" onClick={() => createAssigment()}>
           Submit New Assignment
@@ -48,15 +64,19 @@ const Dashboard = () => {
           {/* Above is a grid div that makes as many 18rem wide columns as it needs */}
           {assignments.map((assignment) => (
             <Card
-              key={assignment.id}
+              key={assignment.number}
               style={{ width: "18rem", height: "18rem" }}
             >
               {/* Making a card to display each assignment and it's information */}
               <Card.Body className="d-flex flex-column justify-content-around">
-                <Card.Title>Assignment Number : #{assignment.id}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  {assignment.status}
-                </Card.Subtitle>
+                <Card.Title>
+                  Assignment Number : #{assignment.number}
+                </Card.Title>
+                <div className="d-flex justify-content-start">
+                  <Badge pill bg="info" style={{ fontSize: "1em" }}>
+                    {assignment.status}
+                  </Badge>
+                </div>
                 <Card.Text style={{ marginTop: "1em" }}>
                   <p>
                     <b>Github URL :</b> {assignment.githubURL}
