@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
-import { Link, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ajax from "../Services/fetchSerivce";
-import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
+import StatusBadge from "../StatusBadge";
+import { useUser } from "../UserProvider";
 
 const CodeReviewerDashboard = () => {
   //Storing the JWT from the HTTP Response
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const { jwt, setJwt } = useUser();
 
   //Storing the assignments
   const [assignments, setAssignments] = useState(null);
+
+  const navigator = useNavigate();
 
   //UseEffect to get the assignments from the system
   useEffect(() => {
@@ -44,6 +47,10 @@ const CodeReviewerDashboard = () => {
     );
   }
 
+  assignments
+    ? assignments.map((assignment) => console.log(assignment.status))
+    : console.log("Nothing");
+
   return (
     <Container>
       <Row>
@@ -55,7 +62,7 @@ const CodeReviewerDashboard = () => {
             onClick={() => {
               //Removing the JWT and moving the user to the login page
               setJwt(null);
-              window.location.href = "/login";
+              navigator("/login");
             }}
           >
             Logout
@@ -90,9 +97,7 @@ const CodeReviewerDashboard = () => {
                       Assignment Number : #{assignment.number}
                     </Card.Title>
                     <div className="d-flex justify-content-start">
-                      <Badge pill bg="info" style={{ fontSize: "1em" }}>
-                        {assignment.status}
-                      </Badge>
+                      <StatusBadge text={assignment.status} />
                     </div>
                     <Card.Text style={{ marginTop: "1em" }}>
                       <p>
@@ -122,15 +127,26 @@ const CodeReviewerDashboard = () => {
       <div className="assignment-wrapper submitted">
         <div className="h3 px-2 assignment-wrapper-title">Awaiting Review</div>
         {assignments &&
-        assignments.filter((assignment) => assignment.status === "Submitted")
-          .length > 0 ? (
+        assignments.filter(
+          (assignment) =>
+            assignment.status === "Submitted" ||
+            assignment.status === "Resubmitted"
+        ).length > 0 ? (
           <div
             className="d-grid gap-5"
             style={{ gridTemplateColumns: "repeat(auto-fill, 18rem)" }}
           >
             {/* Above is a grid div that makes as many 18rem wide columns as it needs */}
             {assignments
-              .filter((assignment) => assignment.status === "Submitted")
+              .filter(
+                (assignment) =>
+                  assignment.status === "Submitted" ||
+                  assignment.status === "Resubmitted"
+              )
+              .sort((a, b) => {
+                if (a.status === "Resubmitted") return -1;
+                else return 1;
+              })
               .map((assignment) => (
                 <Card
                   key={assignment.number}
@@ -142,9 +158,7 @@ const CodeReviewerDashboard = () => {
                       Assignment Number : #{assignment.number}
                     </Card.Title>
                     <div className="d-flex justify-content-start">
-                      <Badge pill bg="info" style={{ fontSize: "1em" }}>
-                        {assignment.status}
-                      </Badge>
+                      <StatusBadge text={assignment.status} />
                     </div>
                     <Card.Text style={{ marginTop: "1em" }}>
                       <p>
@@ -192,9 +206,7 @@ const CodeReviewerDashboard = () => {
                       Assignment Number : #{assignment.number}
                     </Card.Title>
                     <div className="d-flex justify-content-start">
-                      <Badge pill bg="info" style={{ fontSize: "1em" }}>
-                        {assignment.status}
-                      </Badge>
+                      <StatusBadge text={assignment.status} />
                     </div>
                     <Card.Text style={{ marginTop: "1em" }}>
                       <p>

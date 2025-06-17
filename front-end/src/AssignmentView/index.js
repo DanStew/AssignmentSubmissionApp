@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
+import { useEffect, useRef, useState } from "react";
 import ajax from "../Services/fetchSerivce";
 import {
-  Badge,
   Button,
   ButtonGroup,
   Col,
@@ -12,6 +10,9 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
+import StatusBadge from "../StatusBadge";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserProvider";
 
 const AssignmentView = () => {
   //Getting the id of the assigment from the URL
@@ -19,7 +20,7 @@ const AssignmentView = () => {
   const assignmentId = window.location.href.split("/assignments/")[1];
 
   //Getting the jwt from local storage
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const { jwt, setJwt } = useUser();
 
   //Storing the assignment we collected
   const [assignment, setAssignment] = useState({
@@ -37,6 +38,8 @@ const AssignmentView = () => {
   //Using useRef to store the previous assignment value
   const prevAssignmentValue = useRef(assignment);
 
+  const navigator = useNavigate();
+
   //Updating the value of prevAssignmentValue, using a UseEffect
   useEffect(() => {
     //If the two statuses are not equal to eachother, we need to save the assignment
@@ -44,7 +47,7 @@ const AssignmentView = () => {
       prevAssignmentValue.current.status !== assignment.status &&
       prevAssignmentValue.current.status != null
     ) {
-      save();
+      save(assignment.status);
     }
     //Updating the value of the prevAssignment
     prevAssignmentValue.current = assignment;
@@ -63,14 +66,13 @@ const AssignmentView = () => {
   }
 
   //Function to save our new assignment to the database (updating it)
-  function save() {
+  function save(status) {
     //Seeing if we need to change the status value
-    if (assignment.status === assignmentStatuses[0].status) {
-      updateAssignment("status", assignmentStatuses[1].status);
+    if (assignment.status !== status) {
+      updateAssignment("status", status);
     }
     //If we don't need to change the status, run the save
     else {
-      console.log(assignment);
       //Making the fetch request
       ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment)
         //Gathering the data from the response
@@ -110,9 +112,7 @@ const AssignmentView = () => {
               )}
             </Col>
             <Col>
-              <Badge pill bg="info" className="fs-5">
-                {assignment.status}
-              </Badge>
+              <StatusBadge text={assignment.status} />
             </Col>
           </Row>
           {/* Creating the form to allow the user to update the assignments */}
@@ -190,21 +190,42 @@ const AssignmentView = () => {
                 <Button
                   size="lg"
                   variant="secondary"
-                  onClick={() => (window.location.href = "/dashboard")}
+                  onClick={() => navigator("/dashboard")}
                 >
                   Back
                 </Button>
               </div>
             </>
-          ) : (
+          ) : assignment.status === "Pending Submission" ? (
             <div className="d-flex justify-content-between">
-              <Button size="lg" type="button" onClick={() => save()}>
+              <Button
+                size="lg"
+                type="button"
+                onClick={() => save(assignmentStatuses[1].status)}
+              >
                 Submit Assignment
               </Button>
               <Button
                 size="lg"
                 variant="secondary"
-                onClick={() => (window.location.href = "/dashboard")}
+                onClick={() => navigator("/dashboard")}
+              >
+                Back
+              </Button>
+            </div>
+          ) : (
+            <div className="d-flex justify-content-between">
+              <Button
+                size="lg"
+                type="button"
+                onClick={() => save(assignmentStatuses[5].status)}
+              >
+                Re-Submit Assignment
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => navigator("/dashboard")}
               >
                 Back
               </Button>

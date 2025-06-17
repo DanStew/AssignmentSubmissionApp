@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { useLocalState } from "./util/useLocalStorage";
-import { Route, Router, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Home from "./Home";
 import Login from "./Login";
@@ -11,10 +10,12 @@ import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CodeReviewerDashboard from "./CodeReviewerDashboard";
 import CodeReviewAssignmentView from "./CodeReviewAssignmentView";
+import { UserProvider, useUser } from "./UserProvider";
 
 function App() {
   //Getting the JWT
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const { jwt, setJwt } = useUser();
+
   //Storing the user's role
   const [roles, setRoles] = useState(getRolesFromJwt());
 

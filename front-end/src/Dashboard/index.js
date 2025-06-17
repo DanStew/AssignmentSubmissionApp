@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
-import { Link, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ajax from "../Services/fetchSerivce";
-import { Badge, Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
+import StatusBadge from "../StatusBadge";
+import { useUser } from "../UserProvider";
 
 const Dashboard = () => {
   //Storing the JWT from the HTTP Response
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const { jwt, setJwt } = useUser();
 
   //Storing the assignments
   const [assignments, setAssignments] = useState(null);
+
+  const navigator = useNavigate();
 
   //UseEffect to get the assignments from the system
   useEffect(() => {
@@ -44,7 +47,7 @@ const Dashboard = () => {
             onClick={() => {
               //Removing the JWT and moving the user to the login page
               setJwt(null);
-              window.location.href = "/login";
+              navigator("/login");
             }}
           >
             Logout
@@ -73,13 +76,7 @@ const Dashboard = () => {
                   Assignment Number : #{assignment.number}
                 </Card.Title>
                 <div className="d-flex justify-content-start">
-                  <Badge
-                    pill
-                    bg={assignment.status === "Completed" ? "success" : "info"}
-                    style={{ fontSize: "1em" }}
-                  >
-                    {assignment.status}
-                  </Badge>
+                  <StatusBadge text={assignment.status} />
                 </div>
                 <Card.Text style={{ marginTop: "1em" }}>
                   <p>

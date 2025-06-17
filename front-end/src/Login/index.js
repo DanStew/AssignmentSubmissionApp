@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
+import { useState } from "react";
 import {
   Button,
   Col,
@@ -9,14 +8,18 @@ import {
   FormLabel,
   Row,
 } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserProvider";
 
 const Login = () => {
+  //Getting setJwt from User Context
+  const { setJwt } = useUser();
+
   //Storing the username and password
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  //Setting and Storing the JWT, if successfully logged in
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const navigator = useNavigate();
 
   //Function to send the login request to the server
   function sendLoginRequest() {
@@ -125,7 +128,7 @@ const Login = () => {
               id="exit"
               type="button"
               onClick={() => {
-                window.location.href = "/";
+                navigator("/");
               }}
             >
               Exit

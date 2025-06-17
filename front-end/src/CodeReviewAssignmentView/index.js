@@ -1,17 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
+import { useEffect, useRef, useState } from "react";
 import ajax from "../Services/fetchSerivce";
-import {
-  Badge,
-  Button,
-  ButtonGroup,
-  Col,
-  Container,
-  Dropdown,
-  DropdownButton,
-  Form,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import StatusBadge from "../StatusBadge";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../UserProvider";
 
 function CodeReviewAssignmentView() {
   //Getting the id of the assigment from the URL
@@ -19,7 +11,7 @@ function CodeReviewAssignmentView() {
   const assignmentId = window.location.href.split("/assignments/")[1];
 
   //Getting the jwt from local storage
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  const { jwt, setJwt } = useUser();
 
   //Storing the assignment we collected
   const [assignment, setAssignment] = useState({
@@ -36,6 +28,8 @@ function CodeReviewAssignmentView() {
 
   //Using useRef to store the previous assignment value
   const prevAssignmentValue = useRef(assignment);
+
+  const navigator = useNavigate();
 
   //Updating the value of prevAssignmentValue, using a UseEffect
   useEffect(() => {
@@ -109,9 +103,7 @@ function CodeReviewAssignmentView() {
               )}
             </Col>
             <Col>
-              <Badge pill bg="info" className="fs-5">
-                {assignment.status}
-              </Badge>
+              <StatusBadge text={assignment.status} />
             </Col>
           </Row>
           {/* Creating the form to allow the user to update the assignments */}
@@ -205,7 +197,7 @@ function CodeReviewAssignmentView() {
             <Button
               size="lg"
               variant="secondary"
-              onClick={() => (window.location.href = "/dashboard")}
+              onClick={() => navigator("/dashboard")}
             >
               Back
             </Button>

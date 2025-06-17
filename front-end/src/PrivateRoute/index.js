@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useLocalState } from "../util/useLocalStorage";
 import { Navigate } from "react-router-dom";
 import ajax from "../Services/fetchSerivce";
+import { useUser } from "../UserProvider";
 
 const PrivateRoute = ({ children }) => {
-  //Getting the JWT from LS
-  const [jwt, setJwt] = useLocalState("", "jwt");
+  //Getting the jwt from the Context
+  const { jwt, setJwt } = useUser();
 
   //State to define whether we are loading (waiting for the fetch) or not
   const [isLoading, setIsLoading] = useState(true);
