@@ -1,6 +1,14 @@
-.assignment-wrapper{
-    border: 2px dashed lightgray;
-    padding: 2em;
-    border-radius: 1em;
-    margin-top: 2em;
+.assignment-wrapper {
+  border: 2px dashed lightgray;
+  padding: 2em;
+  border-radius: 1em;
+  margin-top: 2em;
+}
+
+.assignment-wrapper-title {
+  width: min-content !important;
+  white-space: nowrap !important;
+  margin-top: -2em !important;
+  margin-bottom: 1em !important;
+  background-color: white !important;
 }

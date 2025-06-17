@@ -10,6 +10,7 @@ import AssignmentView from "./AssignmentView";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CodeReviewerDashboard from "./CodeReviewerDashboard";
+import CodeReviewAssignmentView from "./CodeReviewAssignmentView";
 
 function App() {
   //Getting the JWT
@@ -48,9 +49,15 @@ function App() {
       <Route
         path="/assignments/:id"
         element={
-          <PrivateRoute>
-            <AssignmentView />
-          </PrivateRoute>
+          roles.find((role) => role === "ROLE_CODE_REVIEWER") ? (
+            <PrivateRoute>
+              <CodeReviewAssignmentView />
+            </PrivateRoute>
+          ) : (
+            <PrivateRoute>
+              <AssignmentView />
+            </PrivateRoute>
+          )
         }
       />
       <Route path="/login" element={<Login />} />
