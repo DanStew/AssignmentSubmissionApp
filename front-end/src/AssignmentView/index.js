@@ -11,13 +11,14 @@ import {
   Row,
 } from "react-bootstrap";
 import StatusBadge from "../StatusBadge";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../UserProvider";
+import Comment from "../Comments";
 
 const AssignmentView = () => {
   //Getting the id of the assigment from the URL
   //There is a way to get it from the route, however this is how he did it
-  const assignmentId = window.location.href.split("/assignments/")[1];
+  const { assignmentId } = useParams();
 
   //Getting the jwt from local storage
   const { jwt, setJwt } = useUser();
@@ -38,20 +39,17 @@ const AssignmentView = () => {
   //Using useRef to store the previous assignment value
   const prevAssignmentValue = useRef(assignment);
 
-  const navigator = useNavigate();
+  //Making the comment object
+  const [comment, setComment] = useState({
+    id: null,
+    text: "",
+    assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
+    user: jwt,
+  });
 
-  //Updating the value of prevAssignmentValue, using a UseEffect
-  useEffect(() => {
-    //If the two statuses are not equal to eachother, we need to save the assignment
-    if (
-      prevAssignmentValue.current.status !== assignment.status &&
-      prevAssignmentValue.current.status != null
-    ) {
-      save(assignment.status);
-    }
-    //Updating the value of the prevAssignment
-    prevAssignmentValue.current = assignment;
-  }, [assignment]);
+  const [comments, setComments] = useState([]);
+
+  const navigator = useNavigate();
 
   //Function to update our assignment object with the values input in the form
   //This keeps all our changes in an object, rather than individual variables
@@ -63,6 +61,16 @@ const AssignmentView = () => {
     newAssignment[prop] = value;
     //Setting the original assignment to the new assignment
     setAssignment(newAssignment);
+  }
+
+  //Function to update the comment with new text
+  function updateComment(value, resetId) {
+    const commentCopy = { ...comment };
+    commentCopy.text = value;
+    if (resetId) {
+      commentCopy.id = null;
+    }
+    setComment(commentCopy);
   }
 
   //Function to save our new assignment to the database (updating it)
@@ -83,6 +91,52 @@ const AssignmentView = () => {
     }
   }
 
+  //Function to submit a comment to the system
+  function submitComment() {
+    if (comment.text !== "") {
+      if (comment.id) {
+        ajax(`/api/comments/${comment.id}`, "put", jwt, comment).then(
+          (comment) => {
+            let commentsCopy = [...comments];
+            const i = commentsCopy.findIndex(
+              (oldComment) => oldComment.id === comment.id
+            );
+            commentsCopy[i] = comment;
+            updateComment("", true);
+            setComments(commentsCopy);
+          }
+        );
+      } else {
+        ajax("/api/comments", "post", jwt, comment).then((comment) => {
+          let commentsCopy = [...comments];
+          commentsCopy.push(comment);
+          setComments(commentsCopy); //Adding new comment to comments
+          updateComment("", false); //Resetting comment text
+        });
+      }
+    }
+  }
+
+  //Function to handle the user updating a comment
+  function handleEditComment(commentId) {
+    //Finding the index of the comment with commentId
+    const i = comments.findIndex((comment) => comment.id === commentId);
+
+    const commentCopy = {
+      id: comments[i].id,
+      text: comments[i].text,
+      assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
+      user: jwt,
+    };
+    //Setting the current comment to be the found comment
+    setComment(commentCopy);
+  }
+
+  //Function to handle the user deleting a comment
+  function handleDeleteComment(commentId) {
+    console.log("I've been told to delete this comment : " + commentId);
+  }
+
   //Getting the assignment
   useEffect(() => {
     //Making a GET request asking the system for the assignment
@@ -96,7 +150,27 @@ const AssignmentView = () => {
         //Storing the statuses
         setAssignmentStatuses(assignmentResponse.statusEnums);
       });
+
+    //Getting a list of all the comments for the assignment
+    ajax(`/api/comments?assignmentId=${assignmentId}`, "GET", jwt, null).then(
+      (commentsData) => {
+        setComments(commentsData);
+      }
+    );
   }, []);
+
+  //Updating the value of prevAssignmentValue, using a UseEffect
+  useEffect(() => {
+    //If the two statuses are not equal to eachother, we need to save the assignment
+    if (
+      prevAssignmentValue.current.status !== assignment.status &&
+      prevAssignmentValue.current.status != null
+    ) {
+      save(assignment.status);
+    }
+    //Updating the value of the prevAssignment
+    prevAssignmentValue.current = assignment;
+  }, [assignment]);
 
   return (
     <>
@@ -231,6 +305,35 @@ const AssignmentView = () => {
               </Button>
             </div>
           )}
+
+          <div className="mt-5">
+            <textarea
+              style={{ width: "100%", borderRadius: "0.25em" }}
+              value={comment.text}
+              onChange={(e) => updateComment(e.target.value, false)}
+            />
+            {comment.id ? (
+              <div className="d-flex gap-5">
+                <Button onClick={() => submitComment()}>Post Comment</Button>
+                <Button onClick={() => updateComment("", true)}>
+                  Stop Editing
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => submitComment()}>Post Comment</Button>
+            )}
+          </div>
+          {comments.map((comment) => (
+            <Comment
+              key={comment.id}
+              id={comment.id}
+              createdDate={comment.createdDate}
+              createdBy={comment.createdBy}
+              text={comment.text}
+              emitDeleteComment={handleDeleteComment}
+              emitEditComment={handleEditComment}
+            />
+          ))}
         </Container>
       ) : (
         <div>Assignment with this Id doesn't exist</div>

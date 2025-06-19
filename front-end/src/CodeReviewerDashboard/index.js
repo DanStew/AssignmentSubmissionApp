@@ -47,10 +47,6 @@ const CodeReviewerDashboard = () => {
     );
   }
 
-  assignments
-    ? assignments.map((assignment) => console.log(assignment.status))
-    : console.log("Nothing");
-
   return (
     <Container>
       <Row>

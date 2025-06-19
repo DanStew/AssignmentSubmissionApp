@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import { useLocalState } from "../util/useLocalStorage";
 
+//Creating the context that we want to use
 const UserContext = createContext();
 
 //Takes in children as the children are being rendered through this element
